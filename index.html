@@ -5,26 +5,26 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Branch · PCI DSS v4.0 Compliance Dashboard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
   /* ─── Design System ───────────────────────────────── */
   :root {
-    --bg:        #080b0f;
-    --surface:   #0e1318;
-    --surface2:  #141b24;
-    --border:    #1e2d3d;
-    --border2:   #263444;
-    --text:      #c8d8e8;
-    --text-dim:  #5a7a96;
-    --text-muted:#3a5570;
-    --accent:    #00e5ff;
-    --accent2:   #ff6b35;
-    --green:     #00ff88;
-    --yellow:    #ffcc00;
-    --red:       #ff4444;
-    --purple:    #b06cff;
-    --mono:      'Space Mono', monospace;
-    --sans:      'Syne', sans-serif;
+    --bg:        #050e08;
+    --surface:   #0a1a0e;
+    --surface2:  #0f2415;
+    --border:    #163d22;
+    --border2:   #1e5030;
+    --text:      #bfdece;
+    --text-dim:  #4d8c67;
+    --text-muted:#2a5c3e;
+    --accent:    #1bc47d;
+    --accent2:   #f5a623;
+    --green:     #1bc47d;
+    --yellow:    #f5c842;
+    --red:       #ff5757;
+    --purple:    #a855f7;
+    --mono:      'IBM Plex Mono', monospace;
+    --sans:      'Plus Jakarta Sans', sans-serif;
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -46,8 +46,8 @@
     position: fixed;
     inset: 0;
     background-image:
-      linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px);
+      linear-gradient(rgba(27,196,125,0.018) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27,196,125,0.018) 1px, transparent 1px);
     background-size: 40px 40px;
     pointer-events: none;
     z-index: 0;
@@ -156,7 +156,7 @@
     top: -100px; left: 50%;
     transform: translateX(-50%);
     width: 600px; height: 600px;
-    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 65%);
+    background: radial-gradient(circle, rgba(27,196,125,0.08) 0%, transparent 65%);
     pointer-events: none;
   }
 
@@ -301,7 +301,7 @@
 
   tr:last-child td { border-bottom: none; }
 
-  tr:hover td { background: rgba(0,229,255,0.02); }
+  tr:hover td { background: rgba(27,196,125,0.03); }
 
   .td-tool {
     font-family: var(--sans);
@@ -324,13 +324,13 @@
     white-space: nowrap;
   }
 
-  .tag-infra     { background: rgba(0,229,255,0.1);  color: var(--accent);  border: 1px solid rgba(0,229,255,0.2); }
+  .tag-infra     { background: rgba(27,196,125,0.12);  color: var(--accent);  border: 1px solid rgba(27,196,125,0.22); }
   .tag-uar       { background: rgba(176,108,255,0.1); color: var(--purple);  border: 1px solid rgba(176,108,255,0.2); }
   .tag-ticketing { background: rgba(255,107,53,0.1);  color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
   .tag-policy    { background: rgba(0,255,136,0.1);   color: var(--green);   border: 1px solid rgba(0,255,136,0.2); }
   .tag-vc        { background: rgba(255,204,0,0.1);   color: var(--yellow);  border: 1px solid rgba(255,204,0,0.2); }
   .tag-code      { background: rgba(255,204,0,0.1);   color: var(--yellow);  border: 1px solid rgba(255,204,0,0.2); }
-  .tag-storage   { background: rgba(0,229,255,0.07);  color: #7ab8cc;        border: 1px solid rgba(0,229,255,0.12); }
+  .tag-storage   { background: rgba(27,196,125,0.09);  color: #5cb88a;        border: 1px solid rgba(27,196,125,0.14); }
   .tag-export    { background: rgba(255,204,0,0.07);  color: #b8943a;        border: 1px solid rgba(255,204,0,0.12); }
   .tag-hris      { background: rgba(176,108,255,0.07);color: #8a5cc4;        border: 1px solid rgba(176,108,255,0.12); }
   .tag-crm       { background: rgba(255,107,53,0.07); color: #b86040;        border: 1px solid rgba(255,107,53,0.12); }
@@ -509,7 +509,7 @@
   .step-num {
     width: 24px; height: 24px;
     border-radius: 50%;
-    background: rgba(0,229,255,0.1);
+    background: rgba(27,196,125,0.12);
     border: 1px solid var(--accent);
     color: var(--accent);
     font-size: 0.6rem;
@@ -1144,7 +1144,6 @@
     Powered by Drata + Terraform + GitHub Actions
   </div>
   <div class="foot-right">
-    <a href="deployment-guide.html">Deployment Guide</a>
     <a href="https://drata.com/frameworks/pci-dss" target="_blank">Drata PCI DSS</a>
     <a href="https://github.com/drata" target="_blank">Drata GitHub</a>
     <a href="https://www.pcisecuritystandards.org" target="_blank">PCI SSC</a>
