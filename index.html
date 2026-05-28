@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Branch · PCI DSS v4.0 Compliance Dashboard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ─── Design System ───────────────────────────────── */
+  :root {
+    --bg:        #080b0f;
+    --surface:   #0e1318;
+    --surface2:  #141b24;
+    --border:    #1e2d3d;
+    --border2:   #263444;
+    --text:      #c8d8e8;
+    --text-dim:  #5a7a96;
+    --text-muted:#3a5570;
+    --accent:    #00e5ff;
+    --accent2:   #ff6b35;
+    --green:     #00ff88;
+    --yellow:    #ffcc00;
+    --red:       #ff4444;
+    --purple:    #b06cff;
+    --mono:      'Space Mono', monospace;
+    --sans:      'Syne', sans-serif;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--mono);
+    font-size: 13px;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* Grid noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(0,229,255,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.015) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ─── Header ──────────────────────────────────────── */
+  header {
+    position: relative;
+    z-index: 10;
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    gap: 1rem;
+  }
+
+  .header-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-shrink: 0;
+  }
+
+  .header-logo .wordmark {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1.1rem;
+    letter-spacing: -0.02em;
+    color: #fff;
+  }
+
+  .header-logo .sep {
+    color: var(--text-muted);
+    margin: 0 0.25rem;
+  }
+
+  .header-logo .framework {
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 700;
+  }
+
+  .header-status {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .pulse-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50%       { opacity: 0.6; transform: scale(0.85); }
+  }
+
+  nav {
+    display: flex;
+    gap: 0;
+    flex-shrink: 0;
+  }
+
+  nav a {
+    color: var(--text-dim);
+    text-decoration: none;
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0 1rem;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid transparent;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  nav a:hover, nav a.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ─── Hero ────────────────────────────────────────── */
+  .hero {
+    position: relative;
+    z-index: 1;
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    top: -100px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 65%);
+    pointer-events: none;
+  }
+
+  .hero-eyebrow {
+    font-size: 0.65rem;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: clamp(2.4rem, 5vw, 4rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 1.5rem;
+  }
+
+  .hero-title span { color: var(--accent); }
+
+  .hero-sub {
+    max-width: 560px;
+    margin: 0 auto 3rem;
+    color: var(--text-dim);
+    font-size: 0.85rem;
+    line-height: 1.8;
+  }
+
+  .hero-stats {
+    display: flex;
+    gap: 0;
+    justify-content: center;
+    flex-wrap: wrap;
+    max-width: 700px;
+    margin: 0 auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .stat-card {
+    flex: 1;
+    min-width: 120px;
+    padding: 1.5rem 1rem;
+    border-right: 1px solid var(--border);
+    background: var(--surface);
+    text-align: center;
+  }
+
+  .stat-card:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: var(--sans);
+    font-size: 2.2rem;
+    font-weight: 800;
+    line-height: 1;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .stat-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* ─── Main layout ─────────────────────────────────── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1300px;
+    margin: 0 auto;
+    padding: 0 2rem 6rem;
+  }
+
+  section { margin-bottom: 5rem; }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .section-num {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+  }
+
+  .section-title {
+    font-family: var(--sans);
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── Tables ──────────────────────────────────────── */
+  .table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--surface);
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  thead tr {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border2);
+  }
+
+  th {
+    padding: 0.75rem 1.25rem;
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.85rem 1.25rem;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+    font-size: 0.75rem;
+    line-height: 1.5;
+  }
+
+  tr:last-child td { border-bottom: none; }
+
+  tr:hover td { background: rgba(0,229,255,0.02); }
+
+  .td-tool {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #fff;
+    white-space: nowrap;
+  }
+
+  /* ─── Tags ────────────────────────────────────────── */
+  .tag {
+    display: inline-block;
+    font-size: 0.55rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 0.2em 0.55em;
+    border-radius: 2px;
+    margin: 0.1em 0.15em;
+    font-weight: 700;
+    white-space: nowrap;
+  }
+
+  .tag-infra     { background: rgba(0,229,255,0.1);  color: var(--accent);  border: 1px solid rgba(0,229,255,0.2); }
+  .tag-uar       { background: rgba(176,108,255,0.1); color: var(--purple);  border: 1px solid rgba(176,108,255,0.2); }
+  .tag-ticketing { background: rgba(255,107,53,0.1);  color: var(--accent2); border: 1px solid rgba(255,107,53,0.2); }
+  .tag-policy    { background: rgba(0,255,136,0.1);   color: var(--green);   border: 1px solid rgba(0,255,136,0.2); }
+  .tag-vc        { background: rgba(255,204,0,0.1);   color: var(--yellow);  border: 1px solid rgba(255,204,0,0.2); }
+  .tag-code      { background: rgba(255,204,0,0.1);   color: var(--yellow);  border: 1px solid rgba(255,204,0,0.2); }
+  .tag-storage   { background: rgba(0,229,255,0.07);  color: #7ab8cc;        border: 1px solid rgba(0,229,255,0.12); }
+  .tag-export    { background: rgba(255,204,0,0.07);  color: #b8943a;        border: 1px solid rgba(255,204,0,0.12); }
+  .tag-hris      { background: rgba(176,108,255,0.07);color: #8a5cc4;        border: 1px solid rgba(176,108,255,0.12); }
+  .tag-crm       { background: rgba(255,107,53,0.07); color: #b86040;        border: 1px solid rgba(255,107,53,0.12); }
+  .tag-sso       { background: rgba(0,255,136,0.07);  color: #3aad70;        border: 1px solid rgba(0,255,136,0.12); }
+  .tag-scope     { background: rgba(255,68,68,0.12);  color: #ff8888;        border: 1px solid rgba(255,68,68,0.2); }
+  .tag-adjacent  { background: rgba(90,120,150,0.12); color: var(--text-dim); border: 1px solid var(--border2); }
+
+  /* ─── PCI Requirements grid ───────────────────────── */
+  .req-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .req-card {
+    background: var(--surface);
+    padding: 1.5rem;
+    position: relative;
+    transition: background 0.2s;
+  }
+
+  .req-card:hover { background: var(--surface2); }
+
+  .req-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 100%;
+    background: var(--border2);
+    transition: background 0.2s;
+  }
+
+  .req-card.complete::before  { background: var(--green); }
+  .req-card.partial::before   { background: var(--yellow); }
+
+  .req-id {
+    font-size: 0.6rem;
+    letter-spacing: 0.2em;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .req-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: #fff;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+
+  .req-controls {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .req-controls li {
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    padding-left: 1rem;
+    position: relative;
+    line-height: 1.5;
+  }
+
+  .req-controls li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--green);
+  }
+
+  .req-systems {
+    margin-top: 0.75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+
+  .req-badge {
+    font-size: 0.55rem;
+    padding: 0.15em 0.45em;
+    border-radius: 2px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    color: var(--text-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── Terraform file tree ─────────────────────────── */
+  .file-tree {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1.5rem;
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 2;
+    color: var(--text-dim);
+  }
+
+  .file-tree .dir  { color: var(--accent); font-weight: 700; }
+  .file-tree .file { color: var(--text); }
+  .file-tree .note { color: var(--text-muted); font-style: italic; }
+  .file-tree .indent { padding-left: 1.5rem; }
+  .file-tree .indent2 { padding-left: 3rem; }
+
+  /* ─── Code callout ────────────────────────────────── */
+  .callout {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 4px 4px 0;
+    padding: 1.25rem 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 0.72rem;
+    color: var(--text-dim);
+    line-height: 1.8;
+  }
+
+  .callout strong { color: var(--accent); }
+
+  code {
+    background: var(--surface2);
+    color: var(--accent);
+    border: 1px solid var(--border2);
+    border-radius: 2px;
+    padding: 0.1em 0.4em;
+    font-family: var(--mono);
+    font-size: 0.85em;
+  }
+
+  /* ─── Drata workflow ──────────────────────────────── */
+  .workflow {
+    display: flex;
+    gap: 0;
+    align-items: stretch;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    overflow: hidden;
+    flex-wrap: wrap;
+  }
+
+  .workflow-step {
+    flex: 1;
+    min-width: 180px;
+    padding: 1.5rem;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    position: relative;
+  }
+
+  .workflow-step:last-child { border-right: none; }
+
+  .workflow-step::after {
+    content: '→';
+    position: absolute;
+    right: -10px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--accent);
+    font-size: 1rem;
+    z-index: 2;
+    background: var(--surface);
+    padding: 0 2px;
+  }
+
+  .workflow-step:last-child::after { display: none; }
+
+  .step-num {
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    background: rgba(0,229,255,0.1);
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    font-size: 0.6rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .step-title {
+    font-family: var(--sans);
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: #fff;
+    margin-bottom: 0.4rem;
+  }
+
+  .step-desc {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ─── Footer ──────────────────────────────────────── */
+  footer {
+    position: relative;
+    z-index: 1;
+    border-top: 1px solid var(--border);
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  footer .foot-left {
+    font-size: 0.65rem;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  footer .foot-right {
+    display: flex;
+    gap: 1.5rem;
+  }
+
+  footer a {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-decoration: none;
+    letter-spacing: 0.08em;
+  }
+
+  footer a:hover { color: var(--accent); }
+
+  /* ─── Scope legend ────────────────────────────────── */
+  .legend {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    font-size: 0.65rem;
+    color: var(--text-dim);
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  .legend-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* ─── Responsive ──────────────────────────────────── */
+  @media (max-width: 768px) {
+    header { padding: 0 1rem; }
+    nav { display: none; }
+    .hero { padding: 3rem 1rem 2.5rem; }
+    main { padding: 0 1rem 4rem; }
+    .req-grid { grid-template-columns: 1fr; }
+    .workflow { flex-direction: column; }
+    .workflow-step::after { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────── -->
+<header>
+  <div class="header-logo">
+    <span class="wordmark">Branch</span>
+    <span class="sep">/</span>
+    <span class="framework">PCI DSS v4.0</span>
+  </div>
+  <nav>
+    <a href="#integrations" class="active">Integrations</a>
+    <a href="#scope">PCI Scope</a>
+    <a href="#controls">Controls</a>
+    <a href="#terraform">Terraform</a>
+    <a href="#workflow">Workflow</a>
+  </nav>
+  <div class="header-status">
+    <div class="pulse-dot"></div>
+    Drata monitoring active
+  </div>
+</header>
+
+<!-- ─── Hero ───────────────────────────────────────── -->
+<div class="hero">
+  <div class="hero-eyebrow">Compliance as Code</div>
+  <h1 class="hero-title">PCI DSS <span>Continuous</span><br>Compliance Dashboard</h1>
+  <p class="hero-sub">Drata + Terraform enforcing PCI DSS v4.0 across Branch's cardholder data environment with automated evidence collection and real-time control monitoring.</p>
+  <div class="hero-stats">
+    <div class="stat-card">
+      <div class="stat-num">13</div>
+      <div class="stat-label">Drata Integrations</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">7</div>
+      <div class="stat-label">In-Scope Systems</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">11</div>
+      <div class="stat-label">PCI Requirements</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">19</div>
+      <div class="stat-label">Config Rules</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">8</div>
+      <div class="stat-label">CW Alarms</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─── Main ────────────────────────────────────────── -->
+<main>
+
+  <!-- ─ 1. Integrations overlap ─────────────────────── -->
+  <section id="integrations">
+    <div class="section-header">
+      <span class="section-num">01</span>
+      <h2 class="section-title">Branch Tech Stack × Drata Integrations</h2>
+    </div>
+
+    <div class="callout">
+      <strong>13 of Branch's 65 stack tools</strong> have native Drata integrations — enabling automated evidence collection, user access reviews, and continuous control monitoring without manual data gathering.
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Tool</th>
+            <th>Category</th>
+            <th>Drata Integration Types</th>
+            <th>Drata Doc</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-tool">Amazon Web Services</td>
+            <td>Application Hosting</td>
+            <td><span class="tag tag-infra">Infrastructure</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>aws-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Amazon S3</td>
+            <td>Data Stores</td>
+            <td><span class="tag tag-export">Data Export</span></td>
+            <td><code>aws-s3</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Amazon CloudFront</td>
+            <td>Assets &amp; Media</td>
+            <td><span class="tag tag-infra">Infrastructure</span></td>
+            <td><code>aws-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Google Cloud Platform</td>
+            <td>Application Hosting</td>
+            <td><span class="tag tag-infra">Infrastructure</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>gcp-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Cloudflare</td>
+            <td>Assets &amp; Media</td>
+            <td><span class="tag tag-infra">Infrastructure</span><span class="tag tag-sso">SSO</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>cloudflare-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Jira (Atlassian)</td>
+            <td>Collaboration</td>
+            <td><span class="tag tag-ticketing">Ticketing</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>jira-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Confluence (Atlassian)</td>
+            <td>Collaboration</td>
+            <td><span class="tag tag-policy">Policy Management</span></td>
+            <td><code>confluence-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Google Workspace</td>
+            <td>Collaboration</td>
+            <td><span class="tag tag-uar">User Access Review</span><span class="tag tag-sso">SSO</span></td>
+            <td><code>google-workspace-integration</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Terraform Cloud</td>
+            <td>Development</td>
+            <td><span class="tag tag-uar">User Access Review</span><span class="tag tag-code">Compliance as Code</span></td>
+            <td><code>terraform-connection</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Greenhouse</td>
+            <td>Back Office (HR)</td>
+            <td><span class="tag tag-hris">HRIS</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>greenhouse-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">HubSpot</td>
+            <td>Marketing &amp; Sales</td>
+            <td><span class="tag tag-uar">User Access Review</span><span class="tag tag-crm">CRM</span></td>
+            <td><code>hubspot-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Salesforce</td>
+            <td>Marketing &amp; Sales</td>
+            <td><span class="tag tag-uar">User Access Review</span><span class="tag tag-crm">CRM</span></td>
+            <td><code>salesforce-integration-guide</code></td>
+          </tr>
+          <tr>
+            <td class="td-tool">Dropbox</td>
+            <td>Assets &amp; Media</td>
+            <td><span class="tag tag-storage">Cloud Storage</span><span class="tag tag-uar">User Access Review</span></td>
+            <td><code>box-integration-guide</code></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─ 2. PCI Scope ─────────────────────────────────── -->
+  <section id="scope">
+    <div class="section-header">
+      <span class="section-num">02</span>
+      <h2 class="section-title">PCI Scope — In-Scope vs. Adjacent Systems</h2>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--red)"></div> In-Scope CDE (store/process/transmit cardholder data)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--yellow)"></div> Connected-to CDE (network connectivity to CDE)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--text-muted)"></div> Out of Scope (no CHD, no CDE network access)</div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>System</th>
+            <th>PCI Scope</th>
+            <th>Justification</th>
+            <th>Drata Controls</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="td-tool">AWS EC2</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>Hosts application servers processing payment transactions</td>
+            <td>Infrastructure monitoring, UAR, Config rules, GuardDuty</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Amazon S3</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>May store encrypted cardholder data, audit logs, backups</td>
+            <td>Encryption checks, public access blocks, SSL-only policy</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Amazon CloudFront</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>CDN terminating TLS for payment API endpoints</td>
+            <td>TLS version monitoring, WAF integration</td>
+          </tr>
+          <tr>
+            <td class="td-tool">PostgreSQL / MySQL</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>Primary databases storing transaction and account data</td>
+            <td>RDS encryption checks via Config + Drata infrastructure</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Redis</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>Session cache may contain payment session tokens</td>
+            <td>Encryption-in-transit check, access control review</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Kubernetes (EKS)</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>Orchestrates payment processing microservices</td>
+            <td>GuardDuty K8s audit logs, container scanning, RBAC review</td>
+          </tr>
+          <tr>
+            <td class="td-tool">GCP (Pub/Sub)</td>
+            <td><span class="tag tag-scope">In-Scope CDE</span></td>
+            <td>Event streaming for payment events between services</td>
+            <td>CMEK encryption, IAM audit logs, VPC firewall</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Cloudflare</td>
+            <td><span class="tag tag-adjacent">Connected-to CDE</span></td>
+            <td>Network perimeter — WAF/CDN in front of CDE; no CHD storage</td>
+            <td>WAF rules, TLS settings, zone security monitoring</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Jira</td>
+            <td><span class="tag tag-adjacent">Out of Scope</span></td>
+            <td>Ticketing only — no CHD, no direct CDE network access</td>
+            <td>UAR for access hygiene, vulnerability ticket tracking</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Google Workspace</td>
+            <td><span class="tag tag-adjacent">Out of Scope</span></td>
+            <td>Corporate email/docs — no CHD</td>
+            <td>UAR, policy document hosting in Confluence/Drive</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Salesforce / HubSpot</td>
+            <td><span class="tag tag-adjacent">Out of Scope</span></td>
+            <td>CRM — no payment card data stored</td>
+            <td>UAR for access hygiene</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Greenhouse</td>
+            <td><span class="tag tag-adjacent">Out of Scope</span></td>
+            <td>HR/recruiting — background check evidence for PCI Req 12.7</td>
+            <td>UAR, background check evidence</td>
+          </tr>
+          <tr>
+            <td class="td-tool">Confluence</td>
+            <td><span class="tag tag-adjacent">Out of Scope</span></td>
+            <td>Policy repository — critical for PCI evidence, no CHD</td>
+            <td>Policy management, document evidence collection</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ─ 3. PCI Controls ──────────────────────────────── -->
+  <section id="controls">
+    <div class="section-header">
+      <span class="section-num">03</span>
+      <h2 class="section-title">PCI DSS v4.0 Controls Applied to In-Scope Systems</h2>
+    </div>
+
+    <div class="req-grid">
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 1</div>
+        <div class="req-title">Install and Maintain Network Security Controls</div>
+        <ul class="req-controls">
+          <li>AWS Security Groups: default-deny, explicit 443 allow</li>
+          <li>GCP VPC Firewall: deny-all ingress/egress baseline</li>
+          <li>Cloudflare WAF in front of all CDE endpoints</li>
+          <li>Network segmentation between CDE and non-CDE</li>
+          <li>AWS Config rule: <code>restricted-ssh</code>, <code>restricted-common-ports</code></li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">EC2</span><span class="req-badge">GCP</span><span class="req-badge">Cloudflare</span><span class="req-badge">K8s</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 2</div>
+        <div class="req-title">Apply Secure Configurations to All Components</div>
+        <ul class="req-controls">
+          <li>EC2 IMDSv2 enforcement (Config rule)</li>
+          <li>GCP OS Login required (Org Policy)</li>
+          <li>Disable service account key creation (GCP)</li>
+          <li>No public IPs on GCP VMs (Org Policy)</li>
+          <li>Cloudflare: hide server version headers</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">EC2</span><span class="req-badge">GCP</span><span class="req-badge">Cloudflare</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 3</div>
+        <div class="req-title">Protect Stored Account Data</div>
+        <ul class="req-controls">
+          <li>KMS CMK with automatic annual rotation (AWS)</li>
+          <li>EBS encryption by default across all volumes</li>
+          <li>S3 SSE-KMS enforced on all CDE buckets</li>
+          <li>GCP CMEK on GCS with 90-day key rotation</li>
+          <li>RDS storage encryption (Config rule)</li>
+          <li>Drata monitors encryption state continuously</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">EC2/EBS</span><span class="req-badge">S3</span><span class="req-badge">RDS</span><span class="req-badge">GCS</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 4</div>
+        <div class="req-title">Protect Cardholder Data with Strong Cryptography in Transit</div>
+        <ul class="req-controls">
+          <li>S3 bucket policy: deny all HTTP (TLS-only)</li>
+          <li>Cloudflare: TLS 1.2 minimum, TLS 1.3 preferred</li>
+          <li>HSTS with preload (max-age 1 year)</li>
+          <li>301 redirect all HTTP → HTTPS (Cloudflare)</li>
+          <li>AWS Config: <code>s3-bucket-ssl-requests-only</code></li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">S3</span><span class="req-badge">CloudFront</span><span class="req-badge">Cloudflare</span><span class="req-badge">Pub/Sub</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 5</div>
+        <div class="req-title">Protect All Systems Against Malware</div>
+        <ul class="req-controls">
+          <li>GuardDuty: EBS malware scanning on EC2</li>
+          <li>GuardDuty: runtime threat detection</li>
+          <li>Drata monitors GuardDuty status continuously</li>
+          <li>Security Hub aggregates findings across all services</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">EC2</span><span class="req-badge">EBS</span><span class="req-badge">GuardDuty</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 6</div>
+        <div class="req-title">Develop and Maintain Secure Systems and Software</div>
+        <ul class="req-controls">
+          <li>Security Hub PCI DSS standard enabled</li>
+          <li>Cloudflare OWASP Core Ruleset (Managed Rules)</li>
+          <li>Custom WAF: SQLi blocking, admin path protection</li>
+          <li>tfsec + Checkov on every pull request (GitHub Actions)</li>
+          <li>19 AWS Config rules monitoring patch &amp; config state</li>
+          <li>Drata: Jira integration tracks vulnerability remediation</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">EC2</span><span class="req-badge">Cloudflare</span><span class="req-badge">GitHub</span><span class="req-badge">Jira</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 7</div>
+        <div class="req-title">Restrict Access to System Components by Business Need</div>
+        <ul class="req-controls">
+          <li>S3 public access block on all CDE buckets</li>
+          <li>AWS Config: no public S3 read/write</li>
+          <li>IAM root access key check</li>
+          <li>GCP: restrict public IPs on VMs (Org Policy)</li>
+          <li>Cloudflare: block admin paths from non-internal IPs</li>
+          <li>Drata UAR across AWS, GCP, Cloudflare, Google Workspace</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">S3</span><span class="req-badge">IAM</span><span class="req-badge">GCP IAM</span><span class="req-badge">Cloudflare</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 8</div>
+        <div class="req-title">Identify Users and Authenticate Access to System Components</div>
+        <ul class="req-controls">
+          <li>IAM Password Policy: 12+ chars, 90-day rotation, no reuse ×12</li>
+          <li>Config rule: MFA on all IAM console users</li>
+          <li>Config rule: root account MFA enabled</li>
+          <li>CloudWatch alarm: console auth failures</li>
+          <li>Cloudflare: rate-limit login endpoint (5 req/min)</li>
+          <li>Drata: continuous MFA compliance monitoring</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">IAM</span><span class="req-badge">GCP IAM</span><span class="req-badge">Cloudflare</span>
+        </div>
+      </div>
+
+      <div class="req-card partial">
+        <div class="req-id">Requirement 9</div>
+        <div class="req-title">Restrict Physical Access to Cardholder Data</div>
+        <ul class="req-controls">
+          <li>AWS data center physical controls (AWS responsibility)</li>
+          <li>GCP data center physical controls (Google responsibility)</li>
+          <li>Drata: maps AWS SOC2/PCI reports as evidence</li>
+          <li>Document physical access policy in Confluence (Drata)</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">AWS</span><span class="req-badge">GCP</span><span class="req-badge">Confluence</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 10</div>
+        <div class="req-title">Log and Monitor All Access to System Components</div>
+        <ul class="req-controls">
+          <li>CloudTrail: multi-region, log file validation, KMS-encrypted</li>
+          <li>CloudWatch Logs: 365-day retention, 8 security alarms</li>
+          <li>S3 Object Lock GOVERNANCE: 366-day immutable logs</li>
+          <li>GCP Audit Logs: ALL services, all log types, 365-day retention</li>
+          <li>GCP Storage bucket locked retention policy</li>
+          <li>SNS alerts for all suspicious API activity patterns</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">CloudTrail</span><span class="req-badge">CloudWatch</span><span class="req-badge">S3</span><span class="req-badge">GCP Audit Logs</span>
+        </div>
+      </div>
+
+      <div class="req-card complete">
+        <div class="req-id">Requirement 11</div>
+        <div class="req-title">Test Security of Systems and Networks Regularly</div>
+        <ul class="req-controls">
+          <li>GuardDuty: continuous threat detection (S3, K8s, EBS)</li>
+          <li>Security Hub: PCI DSS + AWS Foundational standards</li>
+          <li>GCP Security Command Center: findings source configured</li>
+          <li>Daily GitHub Actions: compliance health check job</li>
+          <li>Drata: maps control failures to PCI requirements automatically</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">GuardDuty</span><span class="req-badge">Security Hub</span><span class="req-badge">GCP SCC</span><span class="req-badge">GitHub Actions</span>
+        </div>
+      </div>
+
+      <div class="req-card partial">
+        <div class="req-id">Requirement 12</div>
+        <div class="req-title">Support Information Security with Organizational Policies</div>
+        <ul class="req-controls">
+          <li>Confluence: policy documents managed via Drata</li>
+          <li>Greenhouse: background check evidence (Req 12.7)</li>
+          <li>Drata: policy acknowledgement tracking</li>
+          <li>Drata: annual risk assessment workflow</li>
+          <li>GitHub Actions: automated compliance reporting</li>
+        </ul>
+        <div class="req-systems">
+          <span class="req-badge">Confluence</span><span class="req-badge">Greenhouse</span><span class="req-badge">Drata</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ─ 4. Terraform Project ─────────────────────────── -->
+  <section id="terraform">
+    <div class="section-header">
+      <span class="section-num">04</span>
+      <h2 class="section-title">Terraform Project Structure</h2>
+    </div>
+
+    <div class="callout">
+      Four modules map directly to PCI-scoped systems. Run <code>terraform apply</code> once to provision all controls; GitHub Actions re-plans on every push and runs a daily compliance health check via the AWS + Drata APIs.
+    </div>
+
+    <div class="file-tree">
+      <div><span class="dir">terraform-pci-compliance/</span></div>
+      <div class="indent"><span class="dir">.github/workflows/</span></div>
+      <div class="indent2"><span class="file">pci-compliance.yml</span> <span class="note">— plan, tfsec, checkov, daily monitor, apply</span></div>
+      <div class="indent"><span class="dir">modules/</span></div>
+      <div class="indent2"><span class="dir">aws-pci/</span></div>
+      <div class="indent2" style="padding-left:4.5rem"><span class="file">main.tf</span> <span class="note">— KMS, CloudTrail, GuardDuty, Security Hub, Config ×19, SGs, EBS enc, CW alarms</span></div>
+      <div class="indent2"><span class="dir">gcp-pci/</span></div>
+      <div class="indent2" style="padding-left:4.5rem"><span class="file">main.tf</span> <span class="note">— CMEK, Audit Log sink, VPC firewall, Org Policies, SCC</span></div>
+      <div class="indent2"><span class="dir">cloudflare-pci/</span></div>
+      <div class="indent2" style="padding-left:4.5rem"><span class="file">main.tf</span> <span class="note">— TLS 1.2+, HSTS, OWASP WAF, Managed Rules, custom rules, HTTP→HTTPS</span></div>
+      <div class="indent2"><span class="dir">drata-setup/</span></div>
+      <div class="indent2" style="padding-left:4.5rem"><span class="file">main.tf</span> <span class="note">— AWS cross-account IAM role + GCP service account for Drata read-only access</span></div>
+      <div class="indent"><span class="file">main.tf</span> <span class="note">— root: calls all four modules</span></div>
+      <div class="indent"><span class="file">variables.tf</span> <span class="note">— all inputs (AWS, GCP, Cloudflare, Drata)</span></div>
+      <div class="indent"><span class="file">outputs.tf</span> <span class="note">— role ARNs to paste into Drata UI</span></div>
+      <div class="indent"><span class="file">providers.tf</span> <span class="note">— AWS, Google, Cloudflare + S3 remote state backend</span></div>
+      <div class="indent"><span class="file">README.md</span> <span class="note">— quickstart, secrets list, full control coverage table</span></div>
+    </div>
+  </section>
+
+  <!-- ─ 5. Drata Workflow ────────────────────────────── -->
+  <section id="workflow">
+    <div class="section-header">
+      <span class="section-num">05</span>
+      <h2 class="section-title">Compliance as Code + Drata Workflow</h2>
+    </div>
+
+    <div class="workflow">
+      <div class="workflow-step">
+        <div class="step-num">1</div>
+        <div class="step-title">terraform apply</div>
+        <div class="step-desc">Provision all PCI controls: security groups, KMS, CloudTrail, GuardDuty, WAF, Drata IAM roles. One command, all four providers.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">2</div>
+        <div class="step-title">Connect Drata</div>
+        <div class="step-desc">Copy <code>terraform output</code> role ARNs and service account emails into Drata Connections UI. 13 integrations enabled.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">3</div>
+        <div class="step-title">Drata Auto-Maps</div>
+        <div class="step-desc">Drata reads your AWS Config, GuardDuty, and GCP state and automatically maps each finding to the relevant PCI DSS v4.0 control.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">4</div>
+        <div class="step-title">Daily Monitor</div>
+        <div class="step-desc">GitHub Actions runs at 06:00 UTC — checks Config non-compliance, GuardDuty HIGH findings, Security Hub failed controls. Alerts Slack on failure.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">5</div>
+        <div class="step-title">PR Gate</div>
+        <div class="step-desc">Every Terraform PR runs tfsec + Checkov. Non-compliant infrastructure changes are blocked before merge. Plan posted to PR as comment.</div>
+      </div>
+      <div class="workflow-step">
+        <div class="step-num">6</div>
+        <div class="step-title">Audit Ready</div>
+        <div class="step-desc">Drata continuously collects evidence. At audit time export the PCI DSS report — all 12 requirements mapped with automated evidence.</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ─── Footer ─────────────────────────────────────── -->
+<footer>
+  <div class="foot-left">
+    Branch · PCI DSS v4.0 Compliance as Code<br>
+    Powered by Drata + Terraform + GitHub Actions
+  </div>
+  <div class="foot-right">
+    <a href="https://drata.com/frameworks/pci-dss" target="_blank">Drata PCI DSS</a>
+    <a href="https://github.com/drata" target="_blank">Drata GitHub</a>
+    <a href="https://www.pcisecuritystandards.org" target="_blank">PCI SSC</a>
+  </div>
+</footer>
+
+<script>
+  // Active nav on scroll
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`nav a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-30% 0px -60% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
