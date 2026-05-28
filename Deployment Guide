@@ -1,0 +1,1426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Branch PCI Compliance — Deployment Guide</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:          #f7f6f2;
+  --bg2:         #efede7;
+  --surface:     #ffffff;
+  --border:      #ddd9d0;
+  --border2:     #c8c3b8;
+  --text:        #1a1916;
+  --text2:       #4a4742;
+  --text3:       #7a7570;
+  --mono:        'IBM Plex Mono', monospace;
+  --sans:        'DM Sans', sans-serif;
+
+  /* Input color coding */
+  --c-required:  #c0392b;
+  --c-req-bg:    #fdf3f2;
+  --c-req-b:     #f5c6c2;
+
+  --c-aws:       #d35400;
+  --c-aws-bg:    #fef5ec;
+  --c-aws-b:     #f5d5b0;
+
+  --c-gcp:       #1a73e8;
+  --c-gcp-bg:    #eef4fd;
+  --c-gcp-b:     #b8d0f5;
+
+  --c-cf:        #f48024;
+  --c-cf-bg:     #fff8f0;
+  --c-cf-b:      #fad5a0;
+
+  --c-drata:     #6b3fa0;
+  --c-drata-bg:  #f5f0fc;
+  --c-drata-b:   #d4b8f0;
+
+  --c-github:    #24292f;
+  --c-github-bg: #f0f0f0;
+  --c-github-b:  #c0c0c0;
+
+  --c-optional:  #2e7d32;
+  --c-opt-bg:    #f0faf1;
+  --c-opt-b:     #a8d5ab;
+
+  --step-done:   #2e7d32;
+  --step-active: #c0392b;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ── Layout ─────────────────────────────────── */
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
+}
+
+/* ── Sidebar ─────────────────────────────────── */
+aside {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 2rem 0;
+  flex-shrink: 0;
+}
+
+.sidebar-brand {
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+
+.brand-label {
+  font-size: 0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 0.3rem;
+}
+
+.brand-title {
+  font-family: var(--sans);
+  font-weight: 700;
+  font-size: 1rem;
+  color: var(--text);
+  line-height: 1.2;
+}
+
+.sidebar-section-label {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  padding: 0.75rem 1.5rem 0.3rem;
+  font-weight: 700;
+}
+
+nav a {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 1.5rem;
+  font-size: 0.78rem;
+  color: var(--text2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s;
+  line-height: 1.3;
+}
+
+nav a:hover {
+  background: var(--bg);
+  color: var(--text);
+}
+
+nav a.active {
+  border-left-color: var(--c-required);
+  background: #fdf3f2;
+  color: var(--c-required);
+  font-weight: 500;
+}
+
+nav a .step-circle {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  color: var(--text3);
+  font-size: 0.55rem;
+  font-family: var(--mono);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-weight: 600;
+}
+
+/* Legend */
+.legend {
+  margin: 1.5rem 1.5rem 0;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--border);
+}
+
+.legend-title {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 0.75rem;
+  font-weight: 700;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--text2);
+}
+
+.swatch {
+  width: 12px; height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Main content ─────────────────────────────── */
+main {
+  padding: 0;
+  max-width: 900px;
+}
+
+/* ── Page header ─────────────────────────────── */
+.page-header {
+  padding: 3rem 3rem 2.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.page-eyebrow {
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-required);
+  margin-bottom: 0.75rem;
+  font-family: var(--mono);
+}
+
+.page-title {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.page-desc {
+  color: var(--text2);
+  max-width: 600px;
+  line-height: 1.7;
+  font-size: 0.9rem;
+}
+
+/* ── Step sections ───────────────────────────── */
+.step {
+  padding: 2.5rem 3rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.step:last-child { border-bottom: none; }
+
+.step-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.step-num-large {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  background: var(--text);
+  color: #fff;
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.step-title-block {}
+
+.step-phase {
+  font-size: 0.58rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 0.2rem;
+  font-family: var(--mono);
+}
+
+.step-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
+
+.step-desc {
+  color: var(--text2);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Sub-steps ─────────────────────────────── */
+.substep {
+  margin-bottom: 1.75rem;
+}
+
+.substep-title {
+  font-weight: 700;
+  font-size: 0.82rem;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.substep-title .badge {
+  font-size: 0.55rem;
+  font-family: var(--mono);
+  padding: 0.15em 0.5em;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Code blocks ─────────────────────────────── */
+.code-block {
+  background: #1a1916;
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+  border: 1px solid #333;
+}
+
+.code-label {
+  background: #252320;
+  padding: 0.4rem 1rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #888;
+  font-family: var(--mono);
+  border-bottom: 1px solid #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.code-label .copy-btn {
+  background: none;
+  border: 1px solid #444;
+  color: #888;
+  font-size: 0.6rem;
+  padding: 0.2em 0.6em;
+  border-radius: 3px;
+  cursor: pointer;
+  font-family: var(--mono);
+  letter-spacing: 0.08em;
+  transition: all 0.15s;
+}
+
+.code-label .copy-btn:hover {
+  border-color: #888;
+  color: #ccc;
+}
+
+.code-label .copy-btn.copied {
+  border-color: var(--c-optional);
+  color: #4caf50;
+}
+
+pre {
+  padding: 1.25rem 1rem;
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  line-height: 1.9;
+  color: #c8c5be;
+}
+
+/* Syntax color classes */
+.c  { color: #888; font-style: italic; }           /* comment */
+.k  { color: #cf8e6d; }                            /* keyword */
+.s  { color: #6aab73; }                            /* string */
+.n  { color: #c8c5be; }                            /* normal */
+.p  { color: #bbb; }                               /* punctuation */
+
+/* Input color tokens — inline highlight */
+.i-req    { color: #ff7b72; background: rgba(192,57,43,0.15); border-radius: 3px; padding: 0 3px; }
+.i-aws    { color: #ffa657; background: rgba(211,84,0,0.15);  border-radius: 3px; padding: 0 3px; }
+.i-gcp    { color: #79c0ff; background: rgba(26,115,232,0.15); border-radius: 3px; padding: 0 3px; }
+.i-cf     { color: #ffb86c; background: rgba(244,128,36,0.15); border-radius: 3px; padding: 0 3px; }
+.i-drata  { color: #d2a8ff; background: rgba(107,63,160,0.15); border-radius: 3px; padding: 0 3px; }
+.i-gh     { color: #a8daff; background: rgba(36,41,47,0.35);   border-radius: 3px; padding: 0 3px; }
+.i-opt    { color: #7ee787; background: rgba(46,125,50,0.15);  border-radius: 3px; padding: 0 3px; }
+
+/* ── Input tables ────────────────────────────── */
+.input-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: 0.75rem 0;
+  font-size: 0.78rem;
+}
+
+.input-table thead tr {
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+}
+
+.input-table th {
+  padding: 0.6rem 1rem;
+  font-size: 0.6rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text3);
+  text-align: left;
+  font-weight: 700;
+}
+
+.input-table td {
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: top;
+  line-height: 1.5;
+}
+
+.input-table tr:last-child td { border-bottom: none; }
+
+.input-table .key {
+  font-family: var(--mono);
+  font-size: 0.7rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.input-table .desc {
+  color: var(--text2);
+  font-size: 0.75rem;
+}
+
+.input-table .where {
+  color: var(--text3);
+  font-size: 0.7rem;
+}
+
+/* Colored row backgrounds */
+.row-req    { background: var(--c-req-bg); border-left: 3px solid var(--c-required) !important; }
+.row-aws    { background: var(--c-aws-bg); border-left: 3px solid var(--c-aws) !important; }
+.row-gcp    { background: var(--c-gcp-bg); border-left: 3px solid var(--c-gcp) !important; }
+.row-cf     { background: var(--c-cf-bg);  border-left: 3px solid var(--c-cf) !important; }
+.row-drata  { background: var(--c-drata-bg); border-left: 3px solid var(--c-drata) !important; }
+.row-gh     { background: var(--c-github-bg); border-left: 3px solid var(--c-github) !important; }
+.row-opt    { background: var(--c-opt-bg); border-left: 3px solid var(--c-optional) !important; }
+
+/* ── Callouts ────────────────────────────────── */
+.callout {
+  border-radius: 6px;
+  padding: 1rem 1.25rem;
+  font-size: 0.8rem;
+  line-height: 1.7;
+  margin: 0.75rem 0;
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-start;
+}
+
+.callout-icon { font-size: 1rem; flex-shrink: 0; margin-top: 0.05rem; }
+.callout-body { flex: 1; }
+.callout-body strong { font-weight: 700; display: block; margin-bottom: 0.2rem; }
+
+.callout-warn { background: #fff8e6; border: 1px solid #f5d87a; color: #5c4a00; }
+.callout-info { background: #eef4fd; border: 1px solid var(--c-gcp-b); color: #0d47a1; }
+.callout-tip  { background: var(--c-opt-bg); border: 1px solid var(--c-opt-b); color: #1b5e20; }
+.callout-danger { background: var(--c-req-bg); border: 1px solid var(--c-req-b); color: #7f0000; }
+
+/* ── Checklist ───────────────────────────────── */
+.checklist {
+  list-style: none;
+  margin: 0.75rem 0;
+}
+
+.checklist li {
+  display: flex;
+  gap: 0.7rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text2);
+  align-items: flex-start;
+}
+
+.checklist li:last-child { border-bottom: none; }
+
+.check-box {
+  width: 16px; height: 16px;
+  border: 1.5px solid var(--border2);
+  border-radius: 3px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.checklist li .tag-provider {
+  font-size: 0.55rem;
+  font-family: var(--mono);
+  padding: 0.1em 0.45em;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* ── Pill badges ─────────────────────────────── */
+.pill {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-family: var(--mono);
+  padding: 0.2em 0.55em;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: middle;
+}
+
+.pill-req   { background: var(--c-req-bg);   color: var(--c-required); border: 1px solid var(--c-req-b); }
+.pill-aws   { background: var(--c-aws-bg);   color: var(--c-aws);      border: 1px solid var(--c-aws-b); }
+.pill-gcp   { background: var(--c-gcp-bg);   color: var(--c-gcp);      border: 1px solid var(--c-gcp-b); }
+.pill-cf    { background: var(--c-cf-bg);    color: var(--c-cf);       border: 1px solid var(--c-cf-b); }
+.pill-drata { background: var(--c-drata-bg); color: var(--c-drata);    border: 1px solid var(--c-drata-b); }
+.pill-gh    { background: var(--c-github-bg);color: var(--c-github);   border: 1px solid var(--c-github-b); }
+.pill-opt   { background: var(--c-opt-bg);   color: var(--c-optional); border: 1px solid var(--c-opt-b); }
+
+/* ── Divider ─────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 1.5rem 0;
+}
+
+/* ── Progress bar ────────────────────────────── */
+.progress-bar {
+  height: 3px;
+  background: var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--c-required);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* ── Screen reader ───────────────────────────── */
+.sr-only { position: absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+@media (max-width: 800px) {
+  .layout { grid-template-columns: 1fr; }
+  aside { display: none; }
+  .step { padding: 2rem 1.5rem; }
+  .page-header { padding: 2rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<div class="layout">
+
+<!-- ── Sidebar ─────────────────────────────────── -->
+<aside>
+  <div class="sidebar-brand">
+    <div class="brand-label">Branch · PCI DSS v4.0</div>
+    <div class="brand-title">Deployment Guide</div>
+  </div>
+
+  <div class="sidebar-section-label">Steps</div>
+  <nav id="sidebar-nav">
+    <a href="#step-prereqs" class="active"><span class="step-circle">0</span>Prerequisites</a>
+    <a href="#step-repo"><span class="step-circle">1</span>Create GitHub Repo</a>
+    <a href="#step-aws"><span class="step-circle">2</span>AWS Setup</a>
+    <a href="#step-gcp"><span class="step-circle">3</span>GCP Setup</a>
+    <a href="#step-cloudflare"><span class="step-circle">4</span>Cloudflare Setup</a>
+    <a href="#step-drata"><span class="step-circle">5</span>Drata Connections</a>
+    <a href="#step-tfvars"><span class="step-circle">6</span>Configure Variables</a>
+    <a href="#step-secrets"><span class="step-circle">7</span>GitHub Secrets</a>
+    <a href="#step-push"><span class="step-circle">8</span>Push & Deploy</a>
+    <a href="#step-verify"><span class="step-circle">9</span>Verify Deployment</a>
+    <a href="#step-pages"><span class="step-circle">10</span>GitHub Pages</a>
+  </nav>
+
+  <div class="legend">
+    <div class="legend-title">Color Key — Inputs</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-required);"></div> Required — must change</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-aws);"></div> AWS value</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-gcp);"></div> GCP value</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-cf);"></div> Cloudflare value</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-drata);"></div> Drata value</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-github);"></div> GitHub value</div>
+    <div class="legend-item"><div class="swatch" style="background:var(--c-optional);"></div> Optional / default ok</div>
+  </div>
+</aside>
+
+<!-- ── Main ────────────────────────────────────── -->
+<main>
+
+  <!-- Page header -->
+  <div class="page-header">
+    <div class="page-eyebrow">Branch · PCI DSS v4.0 · Compliance as Code</div>
+    <h1 class="page-title">Deployment Guide</h1>
+    <p class="page-desc">Step-by-step instructions to deploy the Terraform PCI compliance project. Highlighted values indicate exactly what you need to replace — color-coded by provider.</p>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 0 — Prerequisites
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-prereqs">
+    <div class="step-header">
+      <div class="step-num-large">0</div>
+      <div class="step-title-block">
+        <div class="step-phase">Before You Begin</div>
+        <div class="step-title">Prerequisites &amp; Tool Versions</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Install and authenticate each tool before running any Terraform commands. Versions listed are minimums.</p>
+
+    <div class="substep">
+      <div class="substep-title">Required Tools</div>
+      <div class="code-block">
+        <div class="code-label">terminal — verify installations<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Check versions — all must pass</span>
+terraform --version     <span class="c"># need >= 1.5.0</span>
+aws --version           <span class="c"># need >= 2.x</span>
+gcloud --version        <span class="c"># need >= 450.x</span>
+git --version           <span class="c"># any recent version</span>
+jq --version            <span class="c"># used in CI scripts</span></pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Required Accounts &amp; Access Levels</div>
+      <table class="input-table">
+        <thead><tr><th>Service</th><th>Access Required</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr class="row-aws"><td class="key">AWS</td><td class="desc">IAM user or role with <code>AdministratorAccess</code></td><td class="where">For initial setup only — Drata role uses SecurityAudit</td></tr>
+          <tr class="row-gcp"><td class="key">GCP</td><td class="desc">Project Owner or roles/editor + roles/iam.admin</td><td class="where">Needed to create service accounts and Org Policies</td></tr>
+          <tr class="row-cf"><td class="key">Cloudflare</td><td class="desc">Account-level API token with Zone:Edit + Firewall:Edit</td><td class="where">See Step 4 for exact token permissions</td></tr>
+          <tr class="row-drata"><td class="key">Drata</td><td class="desc">Admin role</td><td class="where">Needed to create connections and obtain External ID</td></tr>
+          <tr class="row-gh"><td class="key">GitHub</td><td class="desc">Repo Admin or Org Owner</td><td class="where">For creating repo, secrets, and branch protection</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Authenticate each CLI</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># AWS — configure with your credentials</span>
+aws configure
+<span class="c"># AWS Access Key ID: [enter yours]</span>
+<span class="c"># AWS Secret Access Key: [enter yours]</span>
+<span class="c"># Default region: us-east-1</span>
+<span class="c"># Default output format: json</span>
+
+<span class="c"># GCP — application default login</span>
+gcloud auth application-default login
+gcloud config set project <span class="i-gcp">YOUR-GCP-PROJECT-ID</span>
+
+<span class="c"># Verify AWS identity</span>
+aws sts get-caller-identity</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 1 — Create GitHub Repo
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-repo">
+    <div class="step-header">
+      <div class="step-num-large">1</div>
+      <div class="step-title-block">
+        <div class="step-phase">GitHub</div>
+        <div class="step-title">Create the Repository</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Create a private repo and push the project. The <code>docs/</code> folder will later serve the compliance dashboard via GitHub Pages.</p>
+
+    <div class="substep">
+      <div class="substep-title">Create on GitHub.com</div>
+      <ul class="checklist">
+        <li><div class="check-box"></div>Go to <strong>github.com/new</strong></li>
+        <li><div class="check-box"></div>Repository name: <strong>pci-compliance</strong> (or your preferred name)</li>
+        <li><div class="check-box"></div>Visibility: <strong>Private</strong> — this repo contains infra definitions</li>
+        <li><div class="check-box"></div>Do <em>not</em> initialize with README (you'll push the existing files)</li>
+        <li><div class="check-box"></div>Click <strong>Create repository</strong></li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Unzip, add .gitignore, and push</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Unzip the downloaded project</span>
+unzip terraform-pci-compliance.zip
+cd terraform-pci-compliance
+
+<span class="c"># Create .gitignore — prevents secrets from being committed</span>
+cat > .gitignore &lt;&lt; 'EOF'
+*.tfvars
+*.tfvars.json
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+tfplan
+*.pem
+*.key
+.DS_Store
+EOF
+
+<span class="c"># Initialize git and push</span>
+git init
+git add .
+git commit -m "feat: initial PCI DSS v4.0 compliance-as-code"
+git branch -M main
+git remote add origin https://github.com/<span class="i-gh">YOUR-ORG</span>/<span class="i-gh">pci-compliance</span>.git
+git push -u origin main</pre>
+      </div>
+      <div class="callout callout-warn">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-body">
+          <strong>Never commit <code>terraform.tfvars</code></strong>
+          The <code>.gitignore</code> above blocks it, but double-check with <code>git status</code> before every push. Your Cloudflare token and Drata External ID live in that file.
+        </div>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Enable branch protection</div>
+      <p style="font-size:0.8rem;color:var(--text2);margin-bottom:0.6rem;">Settings → Branches → Add rule → branch name pattern: <code>main</code></p>
+      <ul class="checklist">
+        <li><div class="check-box"></div>✅ Require a pull request before merging</li>
+        <li><div class="check-box"></div>✅ Require status checks to pass: <code>security-scan</code>, <code>terraform-plan</code></li>
+        <li><div class="check-box"></div>✅ Require branches to be up to date before merging</li>
+        <li><div class="check-box"></div>✅ Include administrators</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 2 — AWS Setup
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-aws">
+    <div class="step-header">
+      <div class="step-num-large">2</div>
+      <div class="step-title-block">
+        <div class="step-phase">AWS</div>
+        <div class="step-title">Gather AWS Values &amp; Create OIDC Role</div>
+      </div>
+    </div>
+
+    <p class="step-desc">You need several AWS identifiers, a pre-existing VPC with CDE subnets, and an OIDC role for GitHub Actions to authenticate without long-lived keys.</p>
+
+    <div class="substep">
+      <div class="substep-title">Collect required AWS values</div>
+      <div class="code-block">
+        <div class="code-label">terminal — run these to find your values<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Your AWS account ID</span>
+aws sts get-caller-identity --query Account --output text
+<span class="c"># → copy the 12-digit number  e.g. 123456789012</span>
+
+<span class="c"># Your VPC ID (VPC hosting the CDE)</span>
+aws ec2 describe-vpcs --query 'Vpcs[?IsDefault==`false`].VpcId' --output table
+
+<span class="c"># Subnet IDs inside that VPC (the CDE subnets)</span>
+aws ec2 describe-subnets \
+  --filters "Name=vpc-id,Values=<span class="i-aws">YOUR-VPC-ID</span>" \
+  --query 'Subnets[].SubnetId' --output text</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Create the GitHub Actions OIDC role</div>
+      <p style="font-size:0.8rem;color:var(--text2);margin-bottom:0.6rem;">This lets GitHub Actions authenticate to AWS without storing access keys as secrets.</p>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># 1. Create the OIDC provider (only once per account)</span>
+aws iam create-open-id-connect-provider \
+  --url https://token.actions.githubusercontent.com \
+  --client-id-list sts.amazonaws.com \
+  --thumbprint-list 6938fd4d98bab03faadb97b34396831e3780aea1
+
+<span class="c"># 2. Create the trust policy file</span>
+cat > /tmp/github-oidc-trust.json &lt;&lt; 'EOF'
+{
+  "Version": "2012-10-17",
+  "Statement": [{
+    "Effect": "Allow",
+    "Principal": {
+      "Federated": "arn:aws:iam::<span class="i-aws">YOUR-ACCOUNT-ID</span>:oidc-provider/token.actions.githubusercontent.com"
+    },
+    "Action": "sts:AssumeRoleWithWebIdentity",
+    "Condition": {
+      "StringEquals": {
+        "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+      },
+      "StringLike": {
+        "token.actions.githubusercontent.com:sub": "repo:<span class="i-gh">YOUR-ORG</span>/<span class="i-gh">pci-compliance</span>:*"
+      }
+    }
+  }]
+}
+EOF
+
+<span class="c"># 3. Create the role</span>
+aws iam create-role \
+  --role-name GitHubActionsPCIRole \
+  --assume-role-policy-document file:///tmp/github-oidc-trust.json
+
+<span class="c"># 4. Attach AdministratorAccess (for Terraform to manage resources)</span>
+aws iam attach-role-policy \
+  --role-name GitHubActionsPCIRole \
+  --policy-arn arn:aws:iam::aws:policy/AdministratorAccess
+
+<span class="c"># 5. Get the role ARN — you'll need this for GitHub secrets</span>
+aws iam get-role --role-name GitHubActionsPCIRole \
+  --query Role.Arn --output text
+<span class="c"># → arn:aws:iam::123456789012:role/GitHubActionsPCIRole</span></pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Create Terraform remote state bucket</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Create S3 bucket for Terraform state</span>
+aws s3api create-bucket \
+  --bucket <span class="i-aws">branch-terraform-state</span> \
+  --region us-east-1
+
+<span class="c"># Enable versioning on the state bucket</span>
+aws s3api put-bucket-versioning \
+  --bucket <span class="i-aws">branch-terraform-state</span> \
+  --versioning-configuration Status=Enabled
+
+<span class="c"># Block all public access</span>
+aws s3api put-public-access-block \
+  --bucket <span class="i-aws">branch-terraform-state</span> \
+  --public-access-block-configuration \
+    BlockPublicAcls=true,IgnorePublicAcls=true,\
+    BlockPublicPolicy=true,RestrictPublicBuckets=true
+
+<span class="c"># Create DynamoDB table for state locking</span>
+aws dynamodb create-table \
+  --table-name <span class="i-aws">branch-terraform-locks</span> \
+  --attribute-definitions AttributeName=LockID,AttributeType=S \
+  --key-schema AttributeName=LockID,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST \
+  --region us-east-1</pre>
+      </div>
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>Bucket name must be globally unique.</strong>
+          If <code>branch-terraform-state</code> is taken, use <code>branch-terraform-state-<span class="i-aws">YOUR-ACCOUNT-ID</span></code>. Update <code>providers.tf</code> to match.
+        </div>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Values to record from this step <span class="pill pill-aws">AWS</span></div>
+      <table class="input-table">
+        <thead><tr><th>Variable</th><th>Where to find it</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr class="row-aws"><td class="key">aws_account_id</td><td class="desc"><code>aws sts get-caller-identity</code></td><td class="where"><code>123456789012</code></td></tr>
+          <tr class="row-aws"><td class="key">vpc_id</td><td class="desc">EC2 → VPC → your CDE VPC</td><td class="where"><code>vpc-0a1b2c3d4e5f</code></td></tr>
+          <tr class="row-aws"><td class="key">cde_subnet_ids</td><td class="desc">EC2 → Subnets → filter by VPC</td><td class="where"><code>["subnet-abc","subnet-def"]</code></td></tr>
+          <tr class="row-aws"><td class="key">AWS_OIDC_ROLE_ARN</td><td class="desc">Output of create-role command above</td><td class="where"><code>arn:aws:iam::123…:role/GitHubActionsPCIRole</code></td></tr>
+          <tr class="row-aws"><td class="key">TF_STATE_BUCKET</td><td class="desc">Bucket you created above</td><td class="where"><code>branch-terraform-state</code></td></tr>
+          <tr class="row-aws"><td class="key">TF_LOCK_TABLE</td><td class="desc">DynamoDB table you created</td><td class="where"><code>branch-terraform-locks</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 3 — GCP Setup
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-gcp">
+    <div class="step-header">
+      <div class="step-num-large">3</div>
+      <div class="step-title-block">
+        <div class="step-phase">Google Cloud Platform</div>
+        <div class="step-title">Collect GCP Project Details</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Enable required APIs and collect the project identifiers Terraform needs. The GCP module creates its own service account for Drata — you don't need to create one manually.</p>
+
+    <div class="substep">
+      <div class="substep-title">Enable required GCP APIs</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Set your project</span>
+gcloud config set project <span class="i-gcp">YOUR-GCP-PROJECT-ID</span>
+
+<span class="c"># Enable all APIs needed by the gcp-pci and drata-setup modules</span>
+gcloud services enable \
+  cloudkms.googleapis.com \
+  logging.googleapis.com \
+  monitoring.googleapis.com \
+  cloudresourcemanager.googleapis.com \
+  cloudasset.googleapis.com \
+  securitycenter.googleapis.com \
+  container.googleapis.com \
+  iam.googleapis.com \
+  compute.googleapis.com
+
+<span class="c"># Get your project ID (if you don't have it)</span>
+gcloud projects list
+
+<span class="c"># Get your project number (needed for some org policies)</span>
+gcloud projects describe <span class="i-gcp">YOUR-GCP-PROJECT-ID</span> --format='value(projectNumber)'</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Values to record from this step <span class="pill pill-gcp">GCP</span></div>
+      <table class="input-table">
+        <thead><tr><th>Variable</th><th>Where to find it</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr class="row-gcp"><td class="key">gcp_project_id</td><td class="desc"><code>gcloud projects list</code></td><td class="where"><code>branch-production-12345</code></td></tr>
+          <tr class="row-gcp"><td class="key">gcp_region</td><td class="desc">Where your GCP resources run</td><td class="where"><code>us-central1</code></td></tr>
+          <tr class="row-gcp"><td class="key">gcp_network_name</td><td class="desc">VPC Network → your CDE network name</td><td class="where"><code>branch-pci-network</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <span class="callout-icon">⚠️</span>
+      <div class="callout-body">
+        <strong>Organization Policies require Org Admin.</strong>
+        The GCP module applies three Org Policies (OS Login, disable SA key creation, no public IPs). If you don't have Org Admin, remove those three <code>google_project_organization_policy</code> blocks from <code>modules/gcp-pci/main.tf</code> and apply them manually through the console.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 4 — Cloudflare Setup
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-cloudflare">
+    <div class="step-header">
+      <div class="step-num-large">4</div>
+      <div class="step-title-block">
+        <div class="step-phase">Cloudflare</div>
+        <div class="step-title">Create API Token &amp; Collect Zone IDs</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Cloudflare requires a scoped API token (not your Global API Key). Create one with exactly the permissions below.</p>
+
+    <div class="substep">
+      <div class="substep-title">Create a scoped API token</div>
+      <ul class="checklist">
+        <li><div class="check-box"></div>Go to <strong>dash.cloudflare.com → My Profile → API Tokens → Create Token</strong></li>
+        <li><div class="check-box"></div>Click <strong>Create Custom Token</strong></li>
+        <li><div class="check-box"></div>Token name: <code>branch-pci-terraform</code></li>
+        <li><div class="check-box"></div>Permissions — add all four rows below:</li>
+      </ul>
+      <table class="input-table" style="margin-top:0.5rem">
+        <thead><tr><th>Resource</th><th>Permission</th></tr></thead>
+        <tbody>
+          <tr class="row-cf"><td class="key">Zone · Firewall Services</td><td class="desc">Edit</td></tr>
+          <tr class="row-cf"><td class="key">Zone · Zone Settings</td><td class="desc">Edit</td></tr>
+          <tr class="row-cf"><td class="key">Zone · Zone</td><td class="desc">Read</td></tr>
+          <tr class="row-cf"><td class="key">Account · Account Firewall Access Rules</td><td class="desc">Edit</td></tr>
+        </tbody>
+      </table>
+      <ul class="checklist" style="margin-top:0.5rem">
+        <li><div class="check-box"></div>Zone Resources: <strong>Include → Specific zone → [your domain]</strong></li>
+        <li><div class="check-box"></div>Click <strong>Continue to summary → Create Token</strong></li>
+        <li><div class="check-box"></div>Copy the token immediately — it's only shown once</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Find your Zone ID and Account ID</div>
+      <div class="code-block">
+        <div class="code-label">terminal — using Cloudflare API<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># List your zones and their IDs</span>
+curl -s -X GET "https://api.cloudflare.com/client/v4/zones" \
+  -H "Authorization: Bearer <span class="i-cf">YOUR-CF-API-TOKEN</span>" \
+  -H "Content-Type: application/json" \
+  | jq '.result[] | {name:.name, id:.id, account_id:.account.id}'</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Values to record from this step <span class="pill pill-cf">Cloudflare</span></div>
+      <table class="input-table">
+        <thead><tr><th>Variable</th><th>Where to find it</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr class="row-cf"><td class="key">cloudflare_api_token</td><td class="desc">Token you just created (sensitive)</td><td class="where"><code>abc123def456…</code></td></tr>
+          <tr class="row-cf"><td class="key">cloudflare_zone_id</td><td class="desc">API output or dash.cloudflare.com → zone overview</td><td class="where"><code>31b2d1fa3…</code></td></tr>
+          <tr class="row-cf"><td class="key">cloudflare_account_id</td><td class="desc">API output or CF dashboard URL</td><td class="where"><code>a9d4b32e…</code></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 5 — Drata Connections
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-drata">
+    <div class="step-header">
+      <div class="step-num-large">5</div>
+      <div class="step-title-block">
+        <div class="step-phase">Drata</div>
+        <div class="step-title">Obtain Drata External ID &amp; Pre-Stage Connections</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Before Terraform can create the cross-account IAM role, you need the External ID that Drata will use to assume it. Get this from Drata first, then Terraform creates the role, then you come back to Drata to complete each connection.</p>
+
+    <div class="substep">
+      <div class="substep-title">Get the Drata External ID</div>
+      <ul class="checklist">
+        <li><div class="check-box"></div>Log in to <strong>app.drata.com</strong></li>
+        <li><div class="check-box"></div>Go to <strong>Connections → Infrastructure → Amazon Web Services</strong></li>
+        <li><div class="check-box"></div>Click <strong>Connect</strong> — Drata shows a setup wizard</li>
+        <li><div class="check-box"></div>On the IAM Role step, copy the <strong>External ID</strong> (looks like a UUID)</li>
+        <li><div class="check-box"></div>Also note the <strong>Drata AWS Account ID</strong> shown on that screen (default: <code>269135526815</code>)</li>
+        <li><div class="check-box"></div>Do <em>not</em> complete the wizard yet — Terraform will create the role</li>
+      </ul>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Values to record from this step <span class="pill pill-drata">Drata</span></div>
+      <table class="input-table">
+        <thead><tr><th>Variable</th><th>Where to find it</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr class="row-drata"><td class="key">drata_external_id</td><td class="desc">Drata Connections → AWS wizard → External ID field</td><td class="where"><code>a1b2c3d4-e5f6-…</code></td></tr>
+          <tr class="row-drata"><td class="key">drata_aws_account_id</td><td class="desc">Shown in same wizard (usually 269135526815)</td><td class="where"><code>269135526815</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="callout callout-info">
+        <span class="callout-icon">ℹ️</span>
+        <div class="callout-body">
+          <strong>After Terraform apply (Step 8)</strong>, come back here to complete each Drata connection. Run <code>terraform output</code> to get the role ARN and GCP service account email to paste into Drata.
+        </div>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Post-apply: Complete all 13 Drata connections</div>
+      <table class="input-table">
+        <thead><tr><th>Connection</th><th>Type</th><th>What to enter in Drata</th></tr></thead>
+        <tbody>
+          <tr class="row-drata"><td class="key">AWS</td><td class="desc">Infrastructure + UAR</td><td class="where">Role ARN from <code>terraform output drata_aws_role_arn</code></td></tr>
+          <tr class="row-drata"><td class="key">GCP</td><td class="desc">Infrastructure + UAR</td><td class="where">Service account email from <code>terraform output drata_gcp_service_account_email</code></td></tr>
+          <tr class="row-cf"><td class="key">Cloudflare</td><td class="desc">Infrastructure + SSO + UAR</td><td class="where">API Token from Step 4</td></tr>
+          <tr class="row-gh"><td class="key">GitHub</td><td class="desc">Version Control + Compliance as Code</td><td class="where">GitHub App installation (OAuth)</td></tr>
+          <tr class="row-req"><td class="key">Jira</td><td class="desc">Ticketing + UAR</td><td class="where">Cloud URL: <code>branch.atlassian.net</code> + API token</td></tr>
+          <tr class="row-req"><td class="key">Confluence</td><td class="desc">Policy Management</td><td class="where">Same Atlassian credentials as Jira</td></tr>
+          <tr class="row-req"><td class="key">Google Workspace</td><td class="desc">UAR + SSO</td><td class="where">Domain-wide delegation using GCP SA unique ID</td></tr>
+          <tr class="row-req"><td class="key">Terraform Cloud</td><td class="desc">UAR + Compliance as Code</td><td class="where">TFC organization + API token</td></tr>
+          <tr class="row-req"><td class="key">Greenhouse</td><td class="desc">HRIS + UAR</td><td class="where">Greenhouse API key (Settings → API Credential Mgmt)</td></tr>
+          <tr class="row-req"><td class="key">HubSpot</td><td class="desc">CRM + UAR</td><td class="where">HubSpot Private App API token</td></tr>
+          <tr class="row-req"><td class="key">Salesforce</td><td class="desc">CRM + UAR</td><td class="where">Salesforce Connected App credentials</td></tr>
+          <tr class="row-req"><td class="key">Dropbox</td><td class="desc">Cloud Storage + UAR</td><td class="where">Dropbox OAuth (admin account)</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 6 — terraform.tfvars
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-tfvars">
+    <div class="step-header">
+      <div class="step-num-large">6</div>
+      <div class="step-title-block">
+        <div class="step-phase">Terraform</div>
+        <div class="step-title">Create <code>terraform.tfvars</code></div>
+      </div>
+    </div>
+
+    <p class="step-desc">Create this file in the project root. Every highlighted value must be replaced. This file is git-ignored — never commit it.</p>
+
+    <div class="callout callout-danger">
+      <span class="callout-icon">🚫</span>
+      <div class="callout-body">
+        <strong>This file must never be committed to git.</strong>
+        Verify with <code>git status</code> — it should not appear. If it does, <code>git rm --cached terraform.tfvars</code> immediately.
+      </div>
+    </div>
+
+    <div class="code-block">
+      <div class="code-label">terraform.tfvars — create in project root<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+      <pre><span class="c"># ─── Global ──────────────────────────────────────────</span>
+environment = <span class="s">"production"</span>
+
+<span class="c"># ─── AWS ─────────────────────────────────────────────</span>
+aws_region     = <span class="s">"<span class="i-aws">us-east-1</span>"</span>                  <span class="c"># Change if different</span>
+aws_account_id = <span class="s">"<span class="i-aws">YOUR-12-DIGIT-ACCOUNT-ID</span>"</span>   <span class="c"># e.g. "123456789012"</span>
+
+vpc_id         = <span class="s">"<span class="i-aws">vpc-XXXXXXXXXXXXXXXXX</span>"</span>       <span class="c"># Your CDE VPC</span>
+cde_subnet_ids = [
+  <span class="s">"<span class="i-aws">subnet-XXXXXXXXXXXXXXXXX</span>"</span>,               <span class="c"># CDE subnet 1 (AZ-a)</span>
+  <span class="s">"<span class="i-aws">subnet-YYYYYYYYYYYYYYYYY</span>"</span>                <span class="c"># CDE subnet 2 (AZ-b)</span>
+]
+
+<span class="c"># CIDRs that can SSH to CDE instances (your VPN/bastion IPs)</span>
+allowed_admin_cidrs = [<span class="s">"<span class="i-aws">YOUR-VPN-CIDR/32</span>"</span>]    <span class="c"># e.g. "10.1.0.5/32"</span>
+
+s3_log_bucket_name       = <span class="s">"<span class="i-aws">branch-pci-audit-logs</span>"</span>    <span class="c"># Must be globally unique</span>
+cloudtrail_name          = <span class="s">"branch-pci-cloudtrail"</span>
+sns_alert_email          = <span class="s">"<span class="i-req">security@yourcompany.com</span>"</span>  <span class="c"># PCI alert destination</span>
+kms_deletion_window_days = 30
+
+<span class="c"># ─── GCP ─────────────────────────────────────────────</span>
+gcp_project_id  = <span class="s">"<span class="i-gcp">your-gcp-project-id</span>"</span>           <span class="c"># e.g. "branch-prod-12345"</span>
+gcp_region      = <span class="s">"<span class="i-gcp">us-central1</span>"</span>                   <span class="c"># Change if different</span>
+gcp_network_name = <span class="s">"<span class="i-gcp">branch-pci-network</span>"</span>           <span class="c"># Your GCP VPC network name</span>
+
+<span class="c"># ─── Cloudflare ──────────────────────────────────────</span>
+cloudflare_api_token  = <span class="s">"<span class="i-cf">YOUR-CLOUDFLARE-API-TOKEN</span>"</span>    <span class="c"># From Step 4</span>
+cloudflare_zone_id    = <span class="s">"<span class="i-cf">YOUR-CLOUDFLARE-ZONE-ID</span>"</span>      <span class="c"># 32-char hex string</span>
+cloudflare_account_id = <span class="s">"<span class="i-cf">YOUR-CLOUDFLARE-ACCOUNT-ID</span>"</span>   <span class="c"># 32-char hex string</span>
+
+<span class="c"># ─── Drata ───────────────────────────────────────────</span>
+drata_external_id    = <span class="s">"<span class="i-drata">UUID-FROM-DRATA-CONNECTIONS-WIZARD</span>"</span> <span class="c"># From Step 5</span>
+drata_aws_account_id = <span class="s">"269135526815"</span>                 <span class="c"># Drata's published AWS account</span>
+
+<span class="c"># Run terraform apply first, then paste the output here:</span>
+<span class="c"># drata_gcp_service_account_id = "leave blank on first apply"</span>
+drata_gcp_service_account_id = <span class="s">"<span class="i-drata">PASTE-AFTER-FIRST-APPLY</span>"</span></pre>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Two-pass apply for <code>drata_gcp_service_account_id</code>.</strong>
+        On the first apply, set it to any placeholder string (e.g. <code>"placeholder"</code>). After apply runs, grab the real value with <code>terraform output drata_gcp_service_account_email</code>, update the tfvars, and run <code>terraform apply</code> again to bind the workload identity.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 7 — GitHub Secrets
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-secrets">
+    <div class="step-header">
+      <div class="step-num-large">7</div>
+      <div class="step-title-block">
+        <div class="step-phase">GitHub</div>
+        <div class="step-title">Add Repository Secrets</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Go to <strong>github.com/YOUR-ORG/pci-compliance → Settings → Secrets and variables → Actions → New repository secret</strong> and add every secret in the table below.</p>
+
+    <table class="input-table">
+      <thead><tr><th>Secret Name</th><th>Value</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr class="row-aws"><td class="key">AWS_OIDC_ROLE_ARN</td><td class="desc">ARN of the GitHubActionsPCIRole</td><td class="where">Step 2 → create-role output</td></tr>
+        <tr class="row-aws"><td class="key">AWS_ACCOUNT_ID</td><td class="desc">12-digit AWS account ID</td><td class="where"><code>aws sts get-caller-identity</code></td></tr>
+        <tr class="row-aws"><td class="key">TF_STATE_BUCKET</td><td class="desc">S3 bucket name for Terraform state</td><td class="where">Step 2 → bucket you created</td></tr>
+        <tr class="row-aws"><td class="key">TF_LOCK_TABLE</td><td class="desc">DynamoDB table name</td><td class="where">Step 2 → table you created</td></tr>
+        <tr class="row-aws"><td class="key">VPC_ID</td><td class="desc">Your CDE VPC ID</td><td class="where">Step 2 → vpc-XXXXX</td></tr>
+        <tr class="row-aws"><td class="key">CDE_SUBNET_IDS</td><td class="desc">JSON array of subnet IDs</td><td class="where"><code>["subnet-abc","subnet-def"]</code></td></tr>
+        <tr class="row-cf"><td class="key">CLOUDFLARE_API_TOKEN</td><td class="desc">Scoped Cloudflare API token</td><td class="where">Step 4 → token you created</td></tr>
+        <tr class="row-cf"><td class="key">CLOUDFLARE_ZONE_ID</td><td class="desc">32-char zone ID</td><td class="where">Step 4 → API output</td></tr>
+        <tr class="row-cf"><td class="key">CLOUDFLARE_ACCOUNT_ID</td><td class="desc">32-char account ID</td><td class="where">Step 4 → API output</td></tr>
+        <tr class="row-gcp"><td class="key">GCP_PROJECT_ID</td><td class="desc">GCP project ID string</td><td class="where">Step 3 → gcloud projects list</td></tr>
+        <tr class="row-drata"><td class="key">DRATA_EXTERNAL_ID</td><td class="desc">UUID from Drata connections wizard</td><td class="where">Step 5 → Drata UI</td></tr>
+        <tr class="row-drata"><td class="key">DRATA_GCP_SA_ID</td><td class="desc">GCP SA unique ID (after first apply)</td><td class="where"><code>terraform output drata_gcp_service_account_email</code></td></tr>
+        <tr class="row-req"><td class="key">PCI_ALERT_EMAIL</td><td class="desc">Email for CloudWatch/SNS PCI alerts</td><td class="where">Your security team email</td></tr>
+        <tr class="row-opt"><td class="key">SLACK_WEBHOOK_URL</td><td class="desc">Slack incoming webhook URL (optional)</td><td class="where">Slack → Apps → Incoming Webhooks</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">💡</span>
+      <div class="callout-body">
+        <strong>Use GitHub CLI to bulk-add secrets.</strong>
+        <code>gh secret set SECRET_NAME --body "value" --repo YOUR-ORG/pci-compliance</code> — faster than clicking through the UI 14 times.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 8 — Push & Deploy
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-push">
+    <div class="step-header">
+      <div class="step-num-large">8</div>
+      <div class="step-title-block">
+        <div class="step-phase">Terraform</div>
+        <div class="step-title">Run Terraform &amp; Push to Trigger CI</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Run Terraform locally first to validate everything, then push to <code>main</code> to trigger the full CI/CD pipeline.</p>
+
+    <div class="substep">
+      <div class="substep-title">Local first apply</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Initialize providers and remote backend</span>
+terraform init
+
+<span class="c"># Validate HCL syntax</span>
+terraform validate
+
+<span class="c"># Review the plan — read it carefully before applying</span>
+terraform plan -var-file=terraform.tfvars
+
+<span class="c"># Apply — type "yes" when prompted</span>
+terraform apply -var-file=terraform.tfvars
+
+<span class="c"># Get the outputs to paste into Drata and second tfvars pass</span>
+terraform output</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Second pass for GCP service account binding</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Get the service account unique ID from the first apply output</span>
+terraform output drata_gcp_service_account_email
+
+<span class="c"># Get the unique ID (needed for Google Workspace domain-wide delegation)</span>
+gcloud iam service-accounts describe \
+  $(terraform output -raw drata_gcp_service_account_email) \
+  --format='value(uniqueId)'
+<span class="c"># → copy this number, update drata_gcp_service_account_id in terraform.tfvars</span>
+
+<span class="c"># Apply again to bind workload identity with the correct SA ID</span>
+terraform apply -var-file=terraform.tfvars</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Push to trigger GitHub Actions pipeline</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Commit any local changes (NOT the tfvars file)</span>
+git add -A
+git status   <span class="c"># confirm terraform.tfvars is NOT listed</span>
+git commit -m "chore: post-deploy config updates"
+git push origin main
+
+<span class="c"># Watch the pipeline run</span>
+<span class="c"># github.com/YOUR-ORG/pci-compliance/actions</span></pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 9 — Verify
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-verify">
+    <div class="step-header">
+      <div class="step-num-large">9</div>
+      <div class="step-title-block">
+        <div class="step-phase">Verification</div>
+        <div class="step-title">Verify All Controls Are Active</div>
+      </div>
+    </div>
+
+    <p class="step-desc">Run these checks after Terraform apply completes to confirm each PCI control is live.</p>
+
+    <div class="substep">
+      <div class="substep-title">AWS verification commands</div>
+      <div class="code-block">
+        <div class="code-label">terminal — AWS<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># CloudTrail — should show IsLogging: true</span>
+aws cloudtrail get-trail-status --name branch-pci-cloudtrail \
+  --query '{IsLogging:IsLogging,LatestDelivery:LatestDeliveryTime}'
+
+<span class="c"># GuardDuty — should show Status: ENABLED</span>
+aws guardduty list-detectors --query 'DetectorIds' --output text | \
+  xargs -I{} aws guardduty get-detector --detector-id {} \
+  --query '{Status:Status,FindingPublishingFrequency:FindingPublishingFrequency}'
+
+<span class="c"># Security Hub — PCI standard should be READY</span>
+aws securityhub get-enabled-standards \
+  --query 'StandardsSubscriptions[].{Arn:StandardsArn,Status:StandardsStatus}'
+
+<span class="c"># Config rules — count how many are COMPLIANT</span>
+aws configservice describe-compliance-by-config-rule \
+  --compliance-types COMPLIANT \
+  --query 'length(ComplianceByConfigRules[?starts_with(ConfigRuleName,`branch-pci-`)])'
+
+<span class="c"># KMS key rotation — RotationEnabled should be true</span>
+aws kms get-key-rotation-status \
+  --key-id alias/branch-pci-cde \
+  --query 'KeyRotationEnabled'
+
+<span class="c"># EBS encryption by default — should be true</span>
+aws ec2 get-ebs-encryption-by-default --query 'EbsEncryptionByDefault'
+
+<span class="c"># IAM password policy — verify minimums</span>
+aws iam get-account-password-policy \
+  --query 'PasswordPolicy.{MinLen:MinimumPasswordLength,MaxAge:MaxPasswordAge,Reuse:PasswordReusePrevention}'</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">GCP verification commands</div>
+      <div class="code-block">
+        <div class="code-label">terminal — GCP<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Audit log sink — verify it exists</span>
+gcloud logging sinks list --project=<span class="i-gcp">YOUR-GCP-PROJECT-ID</span>
+
+<span class="c"># KMS key ring — verify created</span>
+gcloud kms keyrings list --location=<span class="i-gcp">us-central1</span>
+
+<span class="c"># Firewall rules — verify deny-all exists</span>
+gcloud compute firewall-rules list \
+  --filter="name:branch-pci" \
+  --format="table(name,direction,priority,action)"
+
+<span class="c"># Drata service account — verify created</span>
+gcloud iam service-accounts list \
+  --filter="displayName:Drata" \
+  --format="table(email,displayName)"</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Drata verification checklist</div>
+      <ul class="checklist">
+        <li><div class="check-box"></div><span class="tag-provider pill pill-aws">AWS</span> Connection shows green in Drata → Infrastructure controls populating</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-gcp">GCP</span> Connection shows green → Infrastructure controls populating</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-cf">CF</span> Cloudflare connection active → WAF controls visible</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-drata">Drata</span> PCI DSS framework selected under Frameworks</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-drata">Drata</span> Controls tab shows auto-collected evidence for Req 1, 3, 7, 10, 11</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-drata">Drata</span> User Access Reviews configured for AWS, GCP, Cloudflare, Google Workspace</li>
+        <li><div class="check-box"></div><span class="tag-provider pill pill-drata">Drata</span> SNS alert email subscription confirmed (check inbox for confirmation email)</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- ─────────────────────────────────────────────
+       STEP 10 — GitHub Pages
+  ───────────────────────────────────────────── -->
+  <div class="step" id="step-pages">
+    <div class="step-header">
+      <div class="step-num-large">10</div>
+      <div class="step-title-block">
+        <div class="step-phase">GitHub Pages</div>
+        <div class="step-title">Publish the Compliance Dashboard</div>
+      </div>
+    </div>
+
+    <p class="step-desc">The <code>docs/index.html</code> file in the repo is ready to serve as a GitHub Pages site — your live compliance dashboard.</p>
+
+    <div class="substep">
+      <div class="substep-title">Enable GitHub Pages</div>
+      <ul class="checklist">
+        <li><div class="check-box"></div>Go to <strong>github.com/YOUR-ORG/pci-compliance → Settings → Pages</strong></li>
+        <li><div class="check-box"></div>Source: <strong>Deploy from a branch</strong></li>
+        <li><div class="check-box"></div>Branch: <strong>main</strong> · Folder: <strong>/docs</strong></li>
+        <li><div class="check-box"></div>Click <strong>Save</strong></li>
+        <li><div class="check-box"></div>Wait ~2 minutes — dashboard will be live at:</li>
+      </ul>
+      <div class="code-block">
+        <div class="code-label">your dashboard URL</div>
+        <pre>https://<span class="i-gh">YOUR-ORG</span>.github.io/<span class="i-gh">pci-compliance</span>/</pre>
+      </div>
+    </div>
+
+    <div class="substep">
+      <div class="substep-title">Optional: custom domain</div>
+      <div class="code-block">
+        <div class="code-label">terminal<button class="copy-btn" onclick="copyCode(this)">copy</button></div>
+        <pre><span class="c"># Add a CNAME file if you want a custom domain</span>
+echo "<span class="i-opt">compliance.branchapp.com</span>" > docs/CNAME
+git add docs/CNAME
+git commit -m "feat: custom domain for compliance dashboard"
+git push origin main
+<span class="c"># Then add a CNAME DNS record pointing to YOUR-ORG.github.io</span></pre>
+      </div>
+    </div>
+
+    <div class="callout callout-tip">
+      <span class="callout-icon">✅</span>
+      <div class="callout-body">
+        <strong>You're done.</strong>
+        GitHub Actions now runs tfsec + Checkov on every PR, Terraform applies on merge to main, and a daily job at 06:00 UTC checks live compliance state across AWS Config, GuardDuty, and Security Hub — alerting Slack on any failures.
+      </div>
+    </div>
+  </div>
+
+</main>
+</div>
+
+<script>
+// ── Copy buttons ─────────────────────────────────
+function copyCode(btn) {
+  const pre = btn.closest('.code-block').querySelector('pre');
+  const text = pre.innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'copied!';
+    btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'copy'; btn.classList.remove('copied'); }, 2000);
+  });
+}
+
+// ── Sidebar active state on scroll ────────────────
+const steps = document.querySelectorAll('.step[id]');
+const navLinks = document.querySelectorAll('#sidebar-nav a');
+const progress = document.getElementById('progress');
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(a => a.classList.remove('active'));
+      const active = document.querySelector(`#sidebar-nav a[href="#${e.target.id}"]`);
+      if (active) active.classList.add('active');
+    }
+  });
+}, { rootMargin: '-15% 0px -70% 0px' });
+
+steps.forEach(s => obs.observe(s));
+
+// ── Reading progress bar ───────────────────────────
+window.addEventListener('scroll', () => {
+  const total = document.body.scrollHeight - window.innerHeight;
+  const pct = total > 0 ? (window.scrollY / total) * 100 : 0;
+  progress.style.width = pct + '%';
+});
+</script>
+</body>
+</html>
