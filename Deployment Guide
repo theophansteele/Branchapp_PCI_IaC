@@ -557,6 +557,7 @@ pre {
   <div class="sidebar-brand">
     <div class="brand-label">Branch · PCI DSS v4.0</div>
     <div class="brand-title">Deployment Guide</div>
+    <a href="index.html" style="font-size:0.65rem;color:#7a7570;text-decoration:none;margin-top:0.5rem;display:block;">← Back to Dashboard</a>
   </div>
 
   <div class="sidebar-section-label">Steps</div>
