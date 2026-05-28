@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Branch PCI Compliance — Deployment Guide</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
 <style>
 :root {
   --bg:          #f7f6f2;
@@ -17,12 +17,12 @@
   --text2:       #4a4742;
   --text3:       #7a7570;
   --mono:        'IBM Plex Mono', monospace;
-  --sans:        'DM Sans', sans-serif;
+  --sans:        'Plus Jakarta Sans', sans-serif;
 
   /* Input color coding */
-  --c-required:  #c0392b;
-  --c-req-bg:    #fdf3f2;
-  --c-req-b:     #f5c6c2;
+  --c-required:  #1bc47d;
+  --c-req-bg:    #edfaf3;
+  --c-req-b:     #a0dfc0;
 
   --c-aws:       #d35400;
   --c-aws-bg:    #fef5ec;
@@ -48,8 +48,8 @@
   --c-opt-bg:    #f0faf1;
   --c-opt-b:     #a8d5ab;
 
-  --step-done:   #2e7d32;
-  --step-active: #c0392b;
+  --step-done:   #1bc47d;
+  --step-active: #1bc47d;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -132,9 +132,9 @@ nav a:hover {
 }
 
 nav a.active {
-  border-left-color: var(--c-required);
-  background: #fdf3f2;
-  color: var(--c-required);
+  border-left-color: #0d7a4e;
+  background: #edfaf3;
+  color: #0d7a4e;
   font-weight: 500;
 }
 
@@ -201,7 +201,7 @@ main {
   font-size: 0.6rem;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--c-required);
+  color: #0d7a4e;
   margin-bottom: 0.75rem;
   font-family: var(--mono);
 }
@@ -302,7 +302,7 @@ main {
 
 /* ── Code blocks ─────────────────────────────── */
 .code-block {
-  background: #1a1916;
+  background: #0a120d;
   border-radius: 6px;
   overflow: hidden;
   margin: 0.75rem 0;
@@ -310,14 +310,14 @@ main {
 }
 
 .code-label {
-  background: #252320;
+  background: #0f1e14;
   padding: 0.4rem 1rem;
   font-size: 0.6rem;
   letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #888;
+  color: #5a8a6a;
   font-family: var(--mono);
-  border-bottom: 1px solid #333;
+  border-bottom: 1px solid #1a3522;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -325,8 +325,8 @@ main {
 
 .code-label .copy-btn {
   background: none;
-  border: 1px solid #444;
-  color: #888;
+  border: 1px solid #2a5038;
+  color: #5a8a6a;
   font-size: 0.6rem;
   padding: 0.2em 0.6em;
   border-radius: 3px;
@@ -337,7 +337,7 @@ main {
 }
 
 .code-label .copy-btn:hover {
-  border-color: #888;
+  border-color: #5a8a6a;
   color: #ccc;
 }
 
@@ -352,15 +352,15 @@ pre {
   font-family: var(--mono);
   font-size: 0.72rem;
   line-height: 1.9;
-  color: #c8c5be;
+  color: #bddece;
 }
 
 /* Syntax color classes */
-.c  { color: #888; font-style: italic; }           /* comment */
-.k  { color: #cf8e6d; }                            /* keyword */
-.s  { color: #6aab73; }                            /* string */
-.n  { color: #c8c5be; }                            /* normal */
-.p  { color: #bbb; }                               /* punctuation */
+.c  { color: #5a8a6a; font-style: italic; }           /* comment */
+.k  { color: #f5a623; }                            /* keyword */
+.s  { color: #1bc47d; }                            /* string */
+.n  { color: #bddece; }                            /* normal */
+.p  { color: #8ab89a; }                               /* punctuation */
 
 /* Input color tokens — inline highlight */
 .i-req    { color: #ff7b72; background: rgba(192,57,43,0.15); border-radius: 3px; padding: 0 3px; }
@@ -424,7 +424,7 @@ pre {
 }
 
 /* Colored row backgrounds */
-.row-req    { background: var(--c-req-bg); border-left: 3px solid var(--c-required) !important; }
+.row-req    { background: #edfaf3; border-left: 3px solid #1bc47d !important; }
 .row-aws    { background: var(--c-aws-bg); border-left: 3px solid var(--c-aws) !important; }
 .row-gcp    { background: var(--c-gcp-bg); border-left: 3px solid var(--c-gcp) !important; }
 .row-cf     { background: var(--c-cf-bg);  border-left: 3px solid var(--c-cf) !important; }
@@ -448,10 +448,10 @@ pre {
 .callout-body { flex: 1; }
 .callout-body strong { font-weight: 700; display: block; margin-bottom: 0.2rem; }
 
-.callout-warn { background: #fff8e6; border: 1px solid #f5d87a; color: #5c4a00; }
+.callout-warn { background: #fffbeb; border: 1px solid #f5d87a; color: #5c4a00; }
 .callout-info { background: #eef4fd; border: 1px solid var(--c-gcp-b); color: #0d47a1; }
 .callout-tip  { background: var(--c-opt-bg); border: 1px solid var(--c-opt-b); color: #1b5e20; }
-.callout-danger { background: var(--c-req-bg); border: 1px solid var(--c-req-b); color: #7f0000; }
+.callout-danger { background: #edfaf3; border: 1px solid #a0dfc0; color: #7f0000; }
 
 /* ── Checklist ───────────────────────────────── */
 .checklist {
@@ -504,7 +504,7 @@ pre {
   vertical-align: middle;
 }
 
-.pill-req   { background: var(--c-req-bg);   color: var(--c-required); border: 1px solid var(--c-req-b); }
+.pill-req   { background: #edfaf3;   color: #0d7a4e; border: 1px solid #a0dfc0; }
 .pill-aws   { background: var(--c-aws-bg);   color: var(--c-aws);      border: 1px solid var(--c-aws-b); }
 .pill-gcp   { background: var(--c-gcp-bg);   color: var(--c-gcp);      border: 1px solid var(--c-gcp-b); }
 .pill-cf    { background: var(--c-cf-bg);    color: var(--c-cf);       border: 1px solid var(--c-cf-b); }
@@ -530,7 +530,7 @@ pre {
 
 .progress-fill {
   height: 100%;
-  background: var(--c-required);
+  background: #1bc47d;
   width: 0%;
   transition: width 0.1s linear;
 }
@@ -557,7 +557,6 @@ pre {
   <div class="sidebar-brand">
     <div class="brand-label">Branch · PCI DSS v4.0</div>
     <div class="brand-title">Deployment Guide</div>
-    <a href="index.html" style="font-size:0.65rem;color:#7a7570;text-decoration:none;margin-top:0.5rem;display:block;">← Back to Dashboard</a>
   </div>
 
   <div class="sidebar-section-label">Steps</div>
